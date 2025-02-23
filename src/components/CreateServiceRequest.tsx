@@ -5,23 +5,13 @@ import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import moment from 'moment-timezone';
 import { FormControl, TextField, Button, MenuItem, InputLabel, Select, Box, SelectChangeEvent, styled, Typography, Card, ButtonGroup, useTheme, } from '@mui/material';
 import type { Schema } from '../../amplify/data/resource'
-
-interface IServiceRequestState {
-    serviceRequestName: string;
-    serviceRequestDescription: string;
-    creationDate: string;
-    severity: string;
-    resolutionDate: string;
-    reporterName: string;
-    contactInformation: string;
-    location: string;
-}
+import type { IServiceRequestParams } from '../types';
 
 type Action =
-    | { type: "SET_FIELD"; field: keyof IServiceRequestState; value: string }
+    | { type: "SET_FIELD"; field: keyof IServiceRequestParams; value: string }
     | { type: "RESET" };
 
-const serviceRequestReducer = (state: IServiceRequestState, action: Action): IServiceRequestState => {
+const serviceRequestReducer = (state: IServiceRequestParams, action: Action): IServiceRequestParams => {
     switch (action.type) {
         case "SET_FIELD":
             return { ...state, [action.field]: action.value };
@@ -32,7 +22,7 @@ const serviceRequestReducer = (state: IServiceRequestState, action: Action): ISe
     }
 };
 
-const initialState: IServiceRequestState = {
+const initialState: IServiceRequestParams = {
     serviceRequestName: "",
     serviceRequestDescription: "",
     creationDate: moment().format("YYYY-MM-DD"),
@@ -86,7 +76,7 @@ const CreateServiceRequest: React.FC = () => {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>) => {
         const target = e.target;
-        dispatch({ type: "SET_FIELD", field: target.name as keyof IServiceRequestState, value: target.value });
+        dispatch({ type: "SET_FIELD", field: target.name as keyof IServiceRequestParams, value: target.value });
     };
 
     React.useEffect(() => {

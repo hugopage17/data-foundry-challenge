@@ -3,8 +3,9 @@ import { useAuthenticator } from '@aws-amplify/ui-react';
 import { Table, TableContainer, TableHead, TableRow, Box, TableCell, TableBody, styled, Chip, Typography, Divider, LinearProgress, Tooltip, Button } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 import moment from 'moment-timezone';
-import type { Schema } from '../../amplify/data/resource'
 import { generateClient } from 'aws-amplify/data';
+import type { Schema } from '../../amplify/data/resource'
+import type { IServiceRequest } from '../types';
 
 const PrimaryTableCell = styled(TableCell)<{ bold?: boolean }>(({ theme, bold }) => ({
     color: theme.palette.text.primary,
@@ -22,21 +23,6 @@ const ErrorContainer = styled(Box)(({ theme }) => ({
     flexDirection: 'column',
     alignItems: 'center'
 }));
-
-interface IServiceRequest {
-    serviceRequestName: string;
-    serviceRequestDescription: string;
-    creationDate: string;
-    severity: string;
-    resolutionDate: string;
-    reporterName: string;
-    contactInformation: string;
-    location: string;
-    userId: string;
-    caseNumber: string;
-    sortKey: string;
-}
-
 
 const ListServiceRequests: React.FC = () => {
     const [serviceRequests, setServiceRequests] = React.useState<IServiceRequest[]>([]);
