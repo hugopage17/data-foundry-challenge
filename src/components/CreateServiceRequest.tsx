@@ -2,6 +2,7 @@ import React from 'react';
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import { generateClient } from 'aws-amplify/data';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import moment from 'moment-timezone';
 import { FormControl, TextField, Button, MenuItem, InputLabel, Select, Box, SelectChangeEvent, styled, Typography, Card, ButtonGroup, useTheme, } from '@mui/material';
 import type { Schema } from '../../amplify/data/resource'
 
@@ -34,7 +35,7 @@ const serviceRequestReducer = (state: IServiceRequestState, action: Action): ISe
 const initialState: IServiceRequestState = {
     serviceRequestName: "",
     serviceRequestDescription: "",
-    creationDate: "",
+    creationDate: moment().format("YYYY-MM-DD"),
     severity: "",
     resolutionDate: "",
     reporterName: "",
@@ -139,14 +140,15 @@ const CreateServiceRequest: React.FC = () => {
                     required
                     size="small"
                 />
-                <FormControl fullWidth required size="small">
-                    <InputLabel shrink>Severity</InputLabel>
+                <FormControl size="small" required fullWidth>
+                    <InputLabel id="severity-select-label">Severity</InputLabel>
                     <Select
                         name="severity"
+                        labelId="severity-select-label"
+                        id="severity-select"
                         value={state.severity}
+                        label="Severity"
                         onChange={handleChange}
-                        size="small"
-                        displayEmpty
                     >
                         <MenuItem value="Low">Low</MenuItem>
                         <MenuItem value="Medium">Medium</MenuItem>

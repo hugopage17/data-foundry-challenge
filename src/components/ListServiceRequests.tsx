@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAuthenticator } from '@aws-amplify/ui-react';
-import { Table, TableContainer, TableHead, TableRow, Box, TableCell, TableBody, styled, Chip, Typography, Divider, LinearProgress, Tooltip } from '@mui/material';
+import { Table, TableContainer, TableHead, TableRow, Box, TableCell, TableBody, styled, Chip, Typography, Divider, LinearProgress, Tooltip, Button } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 import moment from 'moment-timezone';
 import type { Schema } from '../../amplify/data/resource'
@@ -13,6 +13,14 @@ const PrimaryTableCell = styled(TableCell)<{ bold?: boolean }>(({ theme, bold })
 
 const SecondaryTableCell = styled(TableCell)(({ theme }) => ({
     color: theme.palette.text.secondary
+}));
+
+const ErrorContainer = styled(Box)(({ theme }) => ({
+    display: 'flex',
+    justifyContent: 'center',
+    marginTop: theme.spacing(12),
+    flexDirection: 'column',
+    alignItems: 'center'
 }));
 
 interface IServiceRequest {
@@ -39,20 +47,30 @@ const ListServiceRequests: React.FC = () => {
 
     const { user } = useAuthenticator((context) => [context.user]);
 
-
-    React.useEffect(() => {
-        if (user) {
-            apiClient.models.ServiceRequest.list({
+    const fetchServiceRequests = async () => {
+        isLoading(true)
+        try {
+            const data = await apiClient.models.ServiceRequest.list({
                 userId: user?.userId,
                 sortKey: {
                     between: [moment().subtract(1, 'month').format('YYYY-MM-DD'), moment().add(1, 'month').format('YYYY-MM-DD')]
                 },
                 sortDirection: 'DESC'
-            }).then((res) => {
-                setServiceRequests(res.data);
-                isLoading(false)
             });
+            setServiceRequests(data.data)
+            setError(undefined);
+        } catch (err: any) {
+            setError(err.toString());
+            return [];
+        } finally {
+            isLoading(false);
+        }
 
+    }
+
+    React.useEffect(() => {
+        if (user) {
+            fetchServiceRequests()
             const subscriber = apiClient.models.ServiceRequest.onCreate({
                 filter: {
                     userId: {
@@ -85,11 +103,12 @@ const ListServiceRequests: React.FC = () => {
         return desc
     }
 
-    if (error) {
+    if (error && !loading) {
         return (
-            <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '24px' }}>
+            <ErrorContainer>
                 <Typography variant='subtitle1'>There was an Error fetching Service Requests</Typography>
-            </Box>
+                <Button variant='contained' onClick={fetchServiceRequests}>Retry</Button>
+            </ErrorContainer>
         )
     }
 
