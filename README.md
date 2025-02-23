@@ -1,50 +1,28 @@
-# React + TypeScript + Vite
+# Data Foundry Technical Challenge
+This repository is for the Data Foundry technical challenge.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+[Live demo here](https://daqw40bwe9v16.cloudfront.net)
+You can login to the live demo with email datafoundryuser@gmail.com, password Df_1234! 
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## Get Started
+Get started by first installing required dependencies using the command below.
+```bash
+npm install
+```
+You can run the app locally using the following command
+```bash
+npm run dev
+```
+This application was developed using AWS Amplify and to provision the required resources against an AWS account run the following command
+```bash
+npx ampx sandbox
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+## Implementation
+This application was developed using React Typescript and on the backend uses a collection of AWS services such as Cognito for authentication, S3 for static file storage, DynamoDB for the database and AppSync GraphQL for the API.
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+I decided to use React as the frontend framework with the MUI component library as this is the Javascript UI framework I have the most experience with and it also has great documentation and a large ecosystem of developers using this UI kit.
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+When creating and storing Service Request records in the database I followed DynamoDB best practice by using a Partition key and Sort key for flexible, optimal querying against the database. I set the Partition key to be the userId and the Sort key to be the creationDate#caseNumber. This Primary key strucutre allows me to query for all the SR records against a single user over a particular date range (e.g give me all SR records for user id e4e8d4e8-0031-70e0-a6f4-0eebc06f0d58 between 2025-02-01 & 2025-02-28 and this will provide me with all SR records for that user for the month of February).
+
+As the API is GraphQL which supports realtime subscribing to backend events, the frontend is listening to new Service Requests being created against the current authed user using the onCreate ServiceRequest subscriber and dynamically adding that newly created SR to the table of SRs below the Create Service Request form.

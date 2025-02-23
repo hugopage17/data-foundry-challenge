@@ -2,7 +2,7 @@ import React from 'react';
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import { generateClient } from 'aws-amplify/data';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
-import { FormControl, TextField, Button, MenuItem, InputLabel, Select, Box, SelectChangeEvent, styled, Typography, Card, ButtonGroup, } from '@mui/material';
+import { FormControl, TextField, Button, MenuItem, InputLabel, Select, Box, SelectChangeEvent, styled, Typography, Card, ButtonGroup, useTheme, } from '@mui/material';
 import type { Schema } from '../../amplify/data/resource'
 
 interface IServiceRequestState {
@@ -41,16 +41,6 @@ const initialState: IServiceRequestState = {
     contactInformation: "",
     location: "",
 };
-
-const Container = styled(Card)(({ theme }) => ({
-    display: 'flex',
-    flexDirection: 'column',
-    gap: theme.spacing(2),
-    width: 960,
-    margin: 'auto',
-    marginTop: theme.spacing(12),
-    padding: theme.spacing(2),
-}))
 
 const FormPanel = styled(Box)(({ theme }) => ({
     display: 'flex',
@@ -126,8 +116,18 @@ const CreateServiceRequest: React.FC = () => {
         dispatch({ type: "RESET" });
     };
 
+    const theme = useTheme()
+
     return (
-        <Container elevation={4} component="form" onSubmit={handleSubmit}>
+        <Card sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: theme.spacing(2),
+            width: 960,
+            margin: 'auto',
+            marginTop: theme.spacing(12),
+            padding: theme.spacing(2),
+        }} elevation={4} component="form" onSubmit={handleSubmit}>
             <Typography variant='h5' sx={{ textAlign: 'center' }}>Create a new Service Request</Typography>
             <FormPanel>
                 <TextField
@@ -253,7 +253,7 @@ const CreateServiceRequest: React.FC = () => {
                     <RestartAltIcon />
                 </Button>
             </ButtonGroup>
-        </Container>
+        </Card>
     );
 };
 

@@ -1,7 +1,10 @@
 import React from 'react';
-import { Table, TableContainer, TableHead, TableRow, TableCell, TableBody, styled, Chip, Typography, Divider, LinearProgress, Tooltip } from '@mui/material';
+import { useAuthenticator } from '@aws-amplify/ui-react';
+import { Table, TableContainer, TableHead, TableRow, Box, TableCell, TableBody, styled, Chip, Typography, Divider, LinearProgress, Tooltip } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
-import { useServiceRequests } from '../hooks/useServiceRequests';
+import moment from 'moment-timezone';
+import type { Schema } from '../../amplify/data/resource'
+import { generateClient } from 'aws-amplify/data';
 
 const PrimaryTableCell = styled(TableCell)<{ bold?: boolean }>(({ theme, bold }) => ({
     color: theme.palette.text.primary,
@@ -12,8 +15,57 @@ const SecondaryTableCell = styled(TableCell)(({ theme }) => ({
     color: theme.palette.text.secondary
 }));
 
+interface IServiceRequest {
+    serviceRequestName: string;
+    serviceRequestDescription: string;
+    creationDate: string;
+    severity: string;
+    resolutionDate: string;
+    reporterName: string;
+    contactInformation: string;
+    location: string;
+    userId: string;
+    caseNumber: string;
+    sortKey: string;
+}
+
+
 const ListServiceRequests: React.FC = () => {
-    const { loading, serviceRequests } = useServiceRequests();
+    const [serviceRequests, setServiceRequests] = React.useState<IServiceRequest[]>([]);
+    const [loading, isLoading] = React.useState<boolean>(true);
+    const [error, setError] = React.useState<string | undefined>(undefined);
+
+    const apiClient = generateClient<Schema>();
+
+    const { user } = useAuthenticator((context) => [context.user]);
+
+
+    React.useEffect(() => {
+        if (user) {
+            apiClient.models.ServiceRequest.list({
+                userId: user?.userId,
+                sortKey: {
+                    between: [moment().subtract(1, 'month').format('YYYY-MM-DD'), moment().add(1, 'month').format('YYYY-MM-DD')]
+                },
+                sortDirection: 'DESC'
+            }).then((res) => {
+                setServiceRequests(res.data);
+                isLoading(false)
+            });
+
+            const subscriber = apiClient.models.ServiceRequest.onCreate({
+                filter: {
+                    userId: {
+                        eq: user?.userId
+                    }
+                }
+            }).subscribe({
+                next: (data) => setServiceRequests((state) => [data, ...state]),
+                error: (error) => setError(error)
+            })
+            return () => subscriber.unsubscribe();
+        }
+    }, [user]);
 
     const severityColor = (severity: string) => {
         switch (severity) {
@@ -31,6 +83,14 @@ const ListServiceRequests: React.FC = () => {
             return `${desc.slice(0, 42)}....................`
         }
         return desc
+    }
+
+    if (error) {
+        return (
+            <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '24px' }}>
+                <Typography variant='subtitle1'>There was an Error fetching Service Requests</Typography>
+            </Box>
+        )
     }
 
     return (
