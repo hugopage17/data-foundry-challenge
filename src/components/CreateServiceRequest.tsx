@@ -79,7 +79,7 @@ const CreateServiceRequest: React.FC = () => {
             dispatch({
                 type: "SET_FIELD",
                 field: "resolutionDate",
-                value: resolutionDate.toISOString().split("T")[0], // Format to YYYY-MM-DD
+                value: resolutionDate.toISOString().split("T")[0]
             });
         }
     }, [state.creationDate, state.severity]);
