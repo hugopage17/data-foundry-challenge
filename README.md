@@ -1,7 +1,7 @@
 # Data Foundry Technical Challenge
 This repository is for the Data Foundry technical challenge.
 
-[Live demo here](https://daqw40bwe9v16.cloudfront.net)
+[Live demo here](https://master.d39jj8npl6v464.amplifyapp.com)
 You can login to the live demo with email datafoundryuser@gmail.com, password Df_1234! 
 
 ## Get Started
